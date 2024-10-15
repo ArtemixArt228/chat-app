@@ -34,6 +34,6 @@ export class ChatSessionService {
     }
 }
 
-// Initialize the service
+// Initialize the services
 const factory = new HttpServiceFactory();
 export const chatSessionService = new ChatSessionService(factory.createHttpService());

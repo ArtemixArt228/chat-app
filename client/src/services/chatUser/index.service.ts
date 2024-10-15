@@ -79,6 +79,6 @@ export class ChatUserService {
     }
 }
 
-// Initialize the service
+// Initialize the services
 const factory = new HttpServiceFactory();
 export const chatUserService = new ChatUserService(factory.createHttpService());
