@@ -1,6 +1,5 @@
 import React, { useState, ChangeEvent, KeyboardEvent, FormEvent } from "react";
 import {Socket} from "socket.io-client";
-
 import { toast } from "react-toastify";
 
 interface ChatFooterProps {
@@ -34,7 +33,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ socket }) => {
                 name: userName,
                 id: `${socket.id}${Math.random()}`,
                 socketID: socket.id,
-                time: `${hour}:${min < 10 ? '0' : ''}${min}` // Add leading zero to minutes
+                time: `${hour}:${min < 10 ? '0' : ''}${min}` 
             });
             toast.success('Message sent successfully!');
             setMessage('');

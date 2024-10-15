@@ -3,17 +3,17 @@ import { HttpServiceFactory } from "../index";
 
 import { IResponse } from "../../types";
 
-import {IAddMemberParams, IAddNewGroupParams, ICreateGroupParams, IGetGroupParams} from "./index.type";
+import { IAddMemberParams, IAddNewGroupParams, ICreateGroupParams, IGetGroupParams } from "./index.type";
 
 export class ChatGroupService {
-    constructor(private httpService: HttpService) {}
+    constructor(private httpService: HttpService) { }
 
-    public async createGroup({groupName, members, createdBy,}: ICreateGroupParams) {
+    public async createGroup({ groupName, members, createdBy, }: ICreateGroupParams) {
         try {
             const response = await this.httpService.post<
                 IResponse,
                 IAddNewGroupParams
-            >("api/group/create", { name: groupName, members, createdBy });
+            >("/groups", { name: groupName, members, createdBy });
             return { response };
         } catch (error) {
             return { error };
@@ -23,7 +23,7 @@ export class ChatGroupService {
     public async getGroup({ groupId }: IGetGroupParams) {
         try {
             const response = await this.httpService.get<IResponse>(
-                `api/group/${groupId}`
+                `/groups/${groupId}`
             );
             return { response };
         } catch (error) {
@@ -31,10 +31,21 @@ export class ChatGroupService {
         }
     }
 
+    public async getGroups() {
+        try {
+            const response = await this.httpService.get<IResponse>(
+                `/groups`
+            );
+            return { response }
+        } catch (error) {
+            return { error }
+        }
+    }
+
     public async addMember({ groupId, userId }: IAddMemberParams) {
         try {
             const response = await this.httpService.put<IResponse, IAddMemberParams>(
-                "api/group/addMember",
+                "/groups/addMember",
                 { groupId, userId }
             );
             return { response };

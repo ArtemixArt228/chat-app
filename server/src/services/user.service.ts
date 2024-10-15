@@ -1,11 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import { IUserRepository } from '../interfaces/user.interfaces';
+import {ISessionRepository} from "../interfaces/session.interfaces";
 
-import {userRepository} from "../repository";
+
+import {sessionRepository, userRepository} from "../repository";
 
 class UserService {
-    constructor(private userRepository: IUserRepository) {}
+    constructor(private userRepository: IUserRepository, private sessionRepository: ISessionRepository) {}
 
     async createUser(username: string, socketID: string) {
         const existingUser = await this.userRepository.findOne({ username });
@@ -31,7 +33,8 @@ class UserService {
     }
 
     async getUserBySessionID(sessionID: string) {
-        const session = await this.userRepository.findOne({ sessionID });
+        const session = await this.sessionRepository.findChatSession({ sessionID });
+
         if (!session) {
             throw new Error('Session not found');
         }
@@ -40,4 +43,4 @@ class UserService {
     }
 }
 
-export const userService = new UserService(userRepository);
+export const userService = new UserService(userRepository, sessionRepository);

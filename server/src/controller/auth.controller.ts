@@ -15,15 +15,15 @@ class AuthController {
 
         try {
             const user = await authService.getUserByUsername(username);
+
             if (!user) {
                 responseHandlers.unauthorized(res);
                 return;
             }
 
-            const sessionID = `${user._id}-${Date.now()}`;
-            await sessionService.createSession(user._id, sessionID, +(process.env.SESSION_EXPIRATION || 3600000));
+            const session = await sessionService.createOrUpdateSession(user._id);
 
-            responseHandlers.ok(res, { sessionID });
+            responseHandlers.ok(res, session.sessionID);
             return;
         } catch (error) {
             responseHandlers.error(res);

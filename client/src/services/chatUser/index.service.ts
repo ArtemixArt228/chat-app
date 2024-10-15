@@ -3,9 +3,10 @@ import { HttpServiceFactory } from "../index";
 
 import { IResponse } from "../../types";
 
-import { ICreateUserParams, IUpdateUserStatusParams, ILoginParams, ILogoutParams, ICreateUserResponse, IUpdateUserStatusResponse, ILoginResponse, ILogoutResponse } from "./index.type";
+import { ICreateUserParams, IUpdateUserStatusParams, ILoginParams, ILogoutParams, ICreateUserResponse, IUpdateUserStatusResponse, ILoginResponse, ILogoutResponse, IGetUserParams } from "./index.type";
 
 export class ChatUserService {
+
     constructor(private httpService: HttpService) {}
 
     public async createUser({ username, socketID }: ICreateUserParams) {
@@ -31,10 +32,10 @@ export class ChatUserService {
         }
     }
 
-    public async getUser() {
+    public async getUser({sessionID}: IGetUserParams) {
         try {
             const response = await this.httpService.get<IResponse<ICreateUserResponse>>(
-                'users/me'
+                `users/${sessionID}`
             );
             return { response };
         } catch (error) {
@@ -79,6 +80,6 @@ export class ChatUserService {
     }
 }
 
-// Initialize the services
+// Initialize the service
 const factory = new HttpServiceFactory();
 export const chatUserService = new ChatUserService(factory.createHttpService());

@@ -25,7 +25,7 @@ export class ChatSessionService {
     public async validateSession({ sessionID }: IValidateSessionParams) {
         try {
             const response = await this.httpService.get<IResponse<IValidateSessionResponse>>(
-                `api/session/validate/${sessionID}`
+                `sessions/${sessionID}`
             );
             return { response };
         } catch (error) {
@@ -34,6 +34,6 @@ export class ChatSessionService {
     }
 }
 
-// Initialize the services
+// Initialize the service
 const factory = new HttpServiceFactory();
 export const chatSessionService = new ChatSessionService(factory.createHttpService());

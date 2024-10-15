@@ -8,14 +8,12 @@ import validator from "../middlewares/validator";
 
 import {messageController} from "../controller";
 
-
-
 const router = express.Router();
 
 // Налаштування multer
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Вказуємо папку для зберігання файлів
+        cb(null, 'src/uploads/'); // Вказуємо папку для зберігання файлів
     },
     filename: (req, file, cb) => {
         const originalName = file.originalname; // Отримуємо оригінальну назву файлу

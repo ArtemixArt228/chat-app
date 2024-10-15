@@ -7,6 +7,8 @@ import ChatFooter from "../components/ChatFooter";
 
 
 import {Message} from "../types";
+import UserGroupSection from "../components/UserGroupSection";
+import ChatLayout from "../components/layout/ChatLayout";
 
 interface ChatPageProps {
     socket: Socket;
@@ -19,7 +21,6 @@ const Chat: React.FC<ChatPageProps> = ({ socket }) => {
     const [typingStatus, setTypingStatus] = useState("");
     const lastMessageRef = useRef<HTMLDivElement | null>(null);
 
-    // Update messages when a new message is received
     useEffect(() => {
         const handleMessageResponse = (data: Message) => {
             setMessages((prevMessages) => [...prevMessages, data]);
@@ -32,17 +33,14 @@ const Chat: React.FC<ChatPageProps> = ({ socket }) => {
         };
     }, [socket]);
 
-    // Update localStorage whenever messages change
     useEffect(() => {
         localStorage.setItem("messages", JSON.stringify(messages));
     }, [messages]);
 
-    // Scroll to the bottom when messages change
     useEffect(() => {
         lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    // Update typing status
     useEffect(() => {
         const handleTypingResponse = (data: string) => {
             setTypingStatus(data);
@@ -57,15 +55,7 @@ const Chat: React.FC<ChatPageProps> = ({ socket }) => {
 
     return (
         <div className="chat">
-            <ChatBar socket={socket} />
-            <div className="chat__main">
-                <ChatBody
-                    messages={messages}
-                    lastMessageRef={lastMessageRef}
-                    typingStatus={typingStatus}
-                />
-                <ChatFooter socket={socket} />
-            </div>
+            <ChatLayout socket={socket}/>
         </div>
     );
 };

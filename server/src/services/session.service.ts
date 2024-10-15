@@ -5,17 +5,13 @@ import {ISessionRepository} from "../interfaces/session.interfaces";
 class SessionService {
     constructor(private sessionRepository: ISessionRepository) {}
 
-    async createSession(userId: string, sessionID: string, durationMs: number) {
-        const expiresAt = new Date(Date.now() + durationMs);
-        await this.sessionRepository.createChatSession(userId, sessionID, expiresAt);
-    }
-
     async deleteSession(sessionID: string) {
         return await this.sessionRepository.deleteChatSession(sessionID);
     }
 
     async createOrUpdateSession(userId: string) {
         const existingSession = await this.sessionRepository.findChatSession({ user: userId });
+        console.log(existingSession)
 
         if (existingSession) {
             existingSession.expiresAt = new Date(Date.now() + 60 * 60 * 1000);
@@ -24,6 +20,7 @@ class SessionService {
         }
 
         const sessionID = `${userId}-${Date.now()}`;
+
         return await this.sessionRepository.createChatSession(
             userId,
             sessionID,

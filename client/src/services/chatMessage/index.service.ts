@@ -11,7 +11,7 @@ export class ChatMessageService {
     public async createMessage({ sender, content, groupId, isVoiceMessage, fileURL }: ICreateMessageParams) {
         try {
             const response = await this.httpService.post<IResponse, ICreateMessageParams>(
-                "api/message/create",
+                "messages",
                 { sender, content, groupId, isVoiceMessage, fileURL }
             );
             return { response };
@@ -23,7 +23,7 @@ export class ChatMessageService {
     public async getMessages({ groupId }: IGetMessagesParams) {
         try {
             const response = await this.httpService.get<IResponse<IGetMessagesResponse>>(
-                `api/message/${groupId}`
+                `messages/${groupId}`
             );
             return { response };
         } catch (error) {

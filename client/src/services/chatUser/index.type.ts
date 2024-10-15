@@ -26,11 +26,13 @@ export interface IUpdateUserStatusResponse {
     success: boolean;
 }
 
-export interface ILoginResponse {
-    success: boolean;
-    sessionID: string;
-}
-
 export interface ILogoutResponse {
     success: boolean;
 }
+
+export interface IGetUserParams {
+    sessionID: string;
+}
+
+export type ILoginResponse = string
+
