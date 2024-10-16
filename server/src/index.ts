@@ -16,9 +16,7 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
-}));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -44,7 +42,6 @@ const httpServer = createServer(app);
 // Socket.IO Setup
 const io = new Server(httpServer, {
     cors: {
-        origin: process.env.CLIENT_URL || 'http://localhost:3000',
         methods: ['GET', 'POST'],
     },
 });
