@@ -12,7 +12,7 @@ export class ChatUserService {
     public async createUser({ username, socketID }: ICreateUserParams) {
         try {
             const response = await this.httpService.post<IResponse<ICreateUserResponse>, ICreateUserParams>(
-                '/users',
+                'users',
                 { username, socketID }
             );
             return { response };
@@ -24,7 +24,7 @@ export class ChatUserService {
     public async getUsers() {
         try {
             const response = await this.httpService.get<IResponse<ICreateUserResponse[]>>(
-                '/users'
+                'users'
             );
             return { response };
         } catch (error) {

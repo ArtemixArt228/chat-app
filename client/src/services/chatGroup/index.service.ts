@@ -13,7 +13,7 @@ export class ChatGroupService {
             const response = await this.httpService.post<
                 IResponse,
                 IAddNewGroupParams
-            >("/groups", { name: groupName, members, createdBy });
+            >("groups", { name: groupName, members, createdBy });
             return { response };
         } catch (error) {
             return { error };
@@ -23,7 +23,7 @@ export class ChatGroupService {
     public async getGroup({ groupId }: IGetGroupParams) {
         try {
             const response = await this.httpService.get<IResponse>(
-                `/groups/${groupId}`
+                `groups/${groupId}`
             );
             return { response };
         } catch (error) {
@@ -34,7 +34,7 @@ export class ChatGroupService {
     public async getGroups() {
         try {
             const response = await this.httpService.get<IResponse>(
-                `/groups`
+                `groups`
             );
             return { response }
         } catch (error) {
@@ -45,7 +45,7 @@ export class ChatGroupService {
     public async addMember({ groupId, userId }: IAddMemberParams) {
         try {
             const response = await this.httpService.put<IResponse, IAddMemberParams>(
-                "/groups/addMember",
+                "groups/addMember",
                 { groupId, userId }
             );
             return { response };

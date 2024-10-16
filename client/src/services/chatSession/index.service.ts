@@ -12,7 +12,7 @@ export class ChatSessionService {
     public async createSession({ userId, sessionID }: ICreateSessionParams) {
         try {
             const response = await this.httpService.post<IResponse<ICreateSessionResponse>, ICreateSessionParams>(
-                "api/session/create",
+                "sessions",
                 { userId, sessionID }
             );
             return { response };
