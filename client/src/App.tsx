@@ -7,7 +7,7 @@ import Chat from './pages/Chat';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-const socket = io('http://localhost:4000');
+const socket = io(process.env.REACT_APP_BASE_URL);
 
 function App() {
     return (
