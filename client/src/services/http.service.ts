@@ -11,7 +11,7 @@ export class HttpService implements IHttpClient {
   ) {}
 
   private getFullApiUrl(url: string) {
-    return `${this.baseUrl}${url}`;
+    return `${this.baseUrl}/${url}`;
   }
 
   public async get<T>(url: string, config?: IHttpConfig) {
