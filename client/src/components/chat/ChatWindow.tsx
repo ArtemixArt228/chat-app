@@ -75,7 +75,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ groupId }) => {
       {message.isVoiceMessage ? (
         <audio
           controls
-          src={`${process.env.REACT_APP_BASE_URL}/${message.fileUrl}`}
+          src={message.fileUrl}
           className="mt-1 w-1/3 rounded-md"
         />
       ) : (
