@@ -13,18 +13,18 @@ class MessageController {
             // Convert string to boolean
             const isVoiceMessage = isVoiceMessageStr === 'true' || isVoiceMessageStr === '1';
 
+            let fileName = null;
+
+            // If there is a file, upload it and set the fileName
             if (req.file) {
-                const fileName = `${uuidv4()}-${Date.now()}`;
-
-                await s3Service.uploadFile(req.file.buffer, fileName, req.file.mimetype)
-
-                const newMessage = await messageService.createMessage(sender, content, groupId, isVoiceMessage, fileName);
-
-                responseHandlers.created(res, newMessage);
+                fileName = `${uuidv4()}-${Date.now()}`;
+                await s3Service.uploadFile(req.file.buffer, fileName, req.file.mimetype);
             }
 
-            const newMessage = await messageService.createMessage(sender, content, groupId, isVoiceMessage, null);
+            // Create message, passing null as the fileName if there is no file
+            const newMessage = await messageService.createMessage(sender, content, groupId, isVoiceMessage, fileName);
 
+            // Send response only once
             responseHandlers.created(res, newMessage);
         } catch (error: any) {
             responseHandlers.badRequest(res, error.message);
@@ -37,13 +37,16 @@ class MessageController {
 
             const messages = await messageService.getMessages(groupId);
 
-            for (let message of messages) {
-                if (message.fileName) message.fileUrl = await s3Service.getObjectSignedUrl(message.fileName)
-            }
+            // Use Promise.all to wait for all the async operations to complete
+            await Promise.all(messages.map(async (message: any) => {
+                if (message.fileName) {
+                    message.fileUrl = await s3Service.getObjectSignedUrl(message.fileName);
+                }
+            }));
 
-            responseHandlers.ok(res, messages);
+            responseHandlers.ok(res, messages); // Send response after all async calls complete
         } catch (error) {
-            responseHandlers.error(res);
+            responseHandlers.error(res); // Ensure only one response is sent
         }
     }
 }
