@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import CreateGroupModal from '../CreateGroupModal';
 import GroupList from './GroupList';
+import { useUser } from '../../context/UserContext';
 
 interface User {
     _id: string;
@@ -10,11 +11,11 @@ interface User {
 
 interface UserGroupSectionProps {
     onGroupSelect: (groupId: string) => void;
-    user: User | null;
 }
 
-const UserGroupSection: React.FC<UserGroupSectionProps> = ({ onGroupSelect, user }) => {
+const UserGroupSection: React.FC<UserGroupSectionProps> = ({ onGroupSelect}) => {
     const [isCreateGroupModalOpen, setCreateGroupModalOpen] = useState(false);
+    const {user} = useUser()
 
     const handleOpenModal = () => setCreateGroupModalOpen(true);
     const handleCloseModal = () => setCreateGroupModalOpen(false);

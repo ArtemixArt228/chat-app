@@ -1,42 +1,37 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Socket } from "socket.io-client";
 
 import ChatLayout from "../components/chat/ChatLayout";
 
 import { Message } from "../types";
+import { useSocket } from "../context/SocketContext";
 
-interface ChatPageProps {
-    socket: Socket;
-}
-
-const Chat: React.FC<ChatPageProps> = ({ socket }) => {
+const Chat: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>(
         () => JSON.parse(localStorage.getItem("messages") || "[]")
     );
     const [typingStatus, setTypingStatus] = useState<string>("");
     const lastMessageRef = useRef<HTMLDivElement | null>(null);
+    const {socket} = useSocket()
 
-    // Memoized function to handle message updates
     const handleMessageResponse = useCallback((data: Message) => {
         setMessages((prevMessages) => [...prevMessages, data]);
     }, []);
 
-    // Memoized function to handle typing status updates
     const handleTypingResponse = useCallback((data: string) => {
         setTypingStatus(data);
     }, []);
 
     useEffect(() => {
         // Message response event listener
-        socket.on("messageResponse", handleMessageResponse);
+        socket?.on("messageResponse", handleMessageResponse);
 
         // Typing response event listener
-        socket.on("typingResponse", handleTypingResponse);
+        socket?.on("typingResponse", handleTypingResponse);
 
         // Clean up listeners unmount
         return () => {
-            socket.off("messageResponse", handleMessageResponse);
-            socket.off("typingResponse", handleTypingResponse);
+            socket?.off("messageResponse", handleMessageResponse);
+            socket?.off("typingResponse", handleTypingResponse);
         };
     }, [socket, handleMessageResponse, handleTypingResponse]);
 
@@ -50,7 +45,7 @@ const Chat: React.FC<ChatPageProps> = ({ socket }) => {
         lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    return <ChatLayout socket={socket} />;
+    return <ChatLayout/>;
 };
 
 export default Chat;

@@ -8,17 +8,19 @@ import { chatMessageService } from '../../services/chatMessage/index.service';
 import { chatSessionService } from '../../services/chatSession/index.service';
 
 import { ICreateMessageParams } from '../../services/chatMessage/index.type';
+import { useSocket } from '../../context/SocketContext';
+import { useUser } from '../../context/UserContext';
 
 interface ChatWindowProps {
     groupId: string;
-    socket: Socket;
-    user: any;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ groupId, socket, user }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ groupId}) => {
     const [messages, setMessages] = useState<any[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const sessionID = localStorage.getItem('userSessionId');
+    const {socket} = useSocket()
+    const {user} = useUser()
 
     // Fetch group messages and listen for new messages via WebSocket
     const initializeChat = useCallback(async () => {
@@ -29,11 +31,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ groupId, socket, user }) => {
             toast.error("Couldn't get group messages");
         }
 
-        socket.on('message', (message: ICreateMessageParams) => {
+        socket?.on('message', (message: ICreateMessageParams) => {
             setMessages((prevMessages) => [...prevMessages, message]);
         });
 
-        return () => socket.off('message');
+        return () => socket?.off('message');
     }, [groupId, socket]);
 
     useEffect(() => {
@@ -62,7 +64,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ groupId, socket, user }) => {
             const { response } = await chatMessageService.createMessage(messageToSend);
             if (response) {
                 setMessages((prevMessages) => [...prevMessages, messageToSend]);
-                socket.emit('sendMessage', { groupId, message: messageToSend });
+                socket?.emit('sendMessage', { groupId, message: messageToSend });
                 return true;
             }
         } catch {

@@ -1,30 +1,33 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { Socket } from "socket.io-client";
 import { toast } from "react-toastify";
 
 import { chatUserService } from "../services/chatUser/index.service";
+import { useSocket } from "../context/SocketContext";
 
-interface HomeProps {
-    socket: Socket;
-}
-
-const Home: React.FC<HomeProps> = ({ socket }) => {
+const Home: React.FC = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [isUserRegistered, setIsUserRegistered] = useState(true);
     const [socketReady, setSocketReady] = useState(false);
+    const { socket } = useSocket();
 
     useEffect(() => {
         const checkSocketReady = () => {
-            setSocketReady(!!socket.id);
+            if (socket && socket.id) {
+                setSocketReady(true);
+            }
         };
 
         checkSocketReady();
-        socket.on("connect", checkSocketReady);
+        if (socket) {
+            socket.on("connect", checkSocketReady);
+        }
 
         return () => {
-            socket.off("connect", checkSocketReady);
+            if (socket) {
+                socket.off("connect", checkSocketReady);
+            }
         };
     }, [socket]);
 
@@ -36,7 +39,7 @@ const Home: React.FC<HomeProps> = ({ socket }) => {
             return;
         }
 
-        if (!socketReady) {
+        if (!socketReady || !socket) {
             toast.error("Socket connection not established. Please try again.");
             return;
         }
@@ -48,7 +51,7 @@ const Home: React.FC<HomeProps> = ({ socket }) => {
                 if (response) {
                     let sessionID: string;
 
-                    if (typeof response === 'string') {
+                    if (typeof response === "string") {
                         sessionID = response;
                     } else if (response.data) {
                         sessionID = response.data;
@@ -58,7 +61,7 @@ const Home: React.FC<HomeProps> = ({ socket }) => {
                     }
 
                     socket.emit("newUser", { username, socketID: socket.id });
-                    localStorage.setItem('userSessionId', sessionID);
+                    localStorage.setItem("userSessionId", sessionID);
                     navigate("/chat");
                 } else {
                     toast.error("User not found!");
@@ -68,7 +71,7 @@ const Home: React.FC<HomeProps> = ({ socket }) => {
             }
         } else {
             try {
-                const { response} = await chatUserService.createUser({
+                const { response } = await chatUserService.createUser({
                     username,
                     socketID: socket.id,
                 });
@@ -128,7 +131,6 @@ const Home: React.FC<HomeProps> = ({ socket }) => {
                 </button>
             </div>
         </div>
-
     );
 };
 
