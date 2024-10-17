@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 
 import responseHandlers from "../handlers/response";
 
 import { messageService, s3Service } from "../services";
-
-import { generateFileName } from '../helpers/generateFileName';
 
 class MessageController {
     async createMessage(req: Request, res: Response) {
@@ -15,7 +14,7 @@ class MessageController {
             const isVoiceMessage = isVoiceMessageStr === 'true' || isVoiceMessageStr === '1';
 
             if (req.file) {
-                const fileName = generateFileName()
+                const fileName = `${uuidv4()}-${Date.now()}`;
 
                 await s3Service.uploadFile(req.file.buffer, fileName, req.file.mimetype)
 

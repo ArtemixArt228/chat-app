@@ -3,13 +3,13 @@ import { toast } from 'react-toastify';
 
 import UserGroupSection from '../group/UserGroupSection';
 import ChatWindow from './ChatWindow';
-import { useSocket } from '../../context/SocketContext';
-import { useUser } from '../../context/UserContext';
+import { useSocketContext } from '../../context/SocketContext';
+import { useUserContext } from '../../context/UserContext';
 
 const ChatLayout: React.FC = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
-  const { socket } = useSocket();
-  const { user, fetchUser } = useUser();
+  const { socket } = useSocketContext();
+  const { user, fetchUser } = useUserContext();
 
   useEffect(() => {
     fetchUser();

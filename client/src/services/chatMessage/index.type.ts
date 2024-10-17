@@ -19,7 +19,3 @@ export interface IMessage {
   fileURL?: string;
   createdAt: string;
 }
-
-export interface IGetMessagesResponse {
-  messages: IMessage[];
-}

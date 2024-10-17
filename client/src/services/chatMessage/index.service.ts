@@ -6,24 +6,23 @@ import { IResponse } from '../../types';
 import {
   ICreateMessageParams,
   IGetMessagesParams,
-  IGetMessagesResponse,
+  IMessage,
 } from './index.type';
 
 export class ChatMessageService {
   constructor(private httpService: HttpService) {}
 
-  public async createMessage({
-    sender,
-    content,
-    groupId,
-    isVoiceMessage,
-    file,
-  }: ICreateMessageParams) {
+  public async createMessage(messageFormData: FormData) {
     try {
-      const response = await this.httpService.post<
-        IResponse,
-        ICreateMessageParams
-      >('messages', { sender, content, groupId, isVoiceMessage, file });
+      const response = await this.httpService.post<IResponse, FormData>(
+        'messages',
+        messageFormData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
 
       return { response };
     } catch (error) {
@@ -33,9 +32,9 @@ export class ChatMessageService {
 
   public async getMessages({ groupId }: IGetMessagesParams) {
     try {
-      const response = await this.httpService.get<
-        IResponse<IGetMessagesResponse>
-      >(`messages/${groupId}`);
+      const response = await this.httpService.get<IMessage[]>(
+        `messages/${groupId}`,
+      );
       return { response };
     } catch (error) {
       return { error };

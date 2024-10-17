@@ -1,109 +1,70 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { toast } from 'react-toastify';
+import React, { useEffect, useState } from 'react';
 
 import VoiceRecorder from '../VoiceRecorder';
 
-import { chatMessageService } from '../../services/chatMessage/index.service';
-import { chatSessionService } from '../../services/chatSession/index.service';
+import { useChatMessages, useSessionValidation } from '../../hooks';
 
-import { ICreateMessageParams } from '../../services/chatMessage/index.type';
-import { useSocket } from '../../context/SocketContext';
-import { useUser } from '../../context/UserContext';
+import { useSocketContext, useUserContext } from '../../context';
+
+import { createFormDataForMessage } from '../../utils';
 
 interface ChatWindowProps {
   groupId: string;
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ groupId }) => {
-  const [messages, setMessages] = useState<any[]>([]);
+  const { messages, addMessage, fetchMessages } = useChatMessages(groupId);
   const [newMessage, setNewMessage] = useState('');
-  const sessionID = localStorage.getItem('userSessionId');
-  const { socket } = useSocket();
-  const { user } = useUser();
+  const { socket } = useSocketContext();
+  const { user } = useUserContext();
+  const validateSession = useSessionValidation();
 
-  // Fetch group messages and listen for new messages via WebSocket
-  const initializeChat = useCallback(async () => {
-    try {
-      const { response } = await chatMessageService.getMessages({ groupId });
-      if (response) setMessages(response.data.messages);
-    } catch {
-      toast.error("Couldn't get group messages");
-    }
-
-    socket?.on('message', (message: ICreateMessageParams) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
-
-    return () => socket?.off('message');
-  }, [groupId, socket]);
-
+  // Initialize chat
   useEffect(() => {
-    initializeChat();
-  }, [initializeChat]);
+    fetchMessages();
 
-  // Validate session before sending a message
-  const validateSession = async () => {
-    if (!sessionID) {
-      toast.warn('You are not authorized');
-      return false;
-    }
+    const handleNewMessage = (message: any) => addMessage(message);
 
-    try {
-      const { response: isValid } = await chatSessionService.validateSession({
-        sessionID,
-      });
-      return isValid;
-    } catch {
-      toast.error('Session validation failed');
-      return false;
-    }
-  };
+    // Add event listener
+    socket?.on('message', handleNewMessage);
 
-  // Common function to send a message
-  const sendMessage = async (messageToSend: ICreateMessageParams) => {
-    try {
-      const { response } =
-        await chatMessageService.createMessage(messageToSend);
-      if (response) {
-        setMessages((prevMessages) => [...prevMessages, messageToSend]);
-        socket?.emit('sendMessage', { groupId, message: messageToSend });
-        return true;
-      }
-    } catch {
-      toast.error('Error sending message');
-    }
-    return false;
-  };
+    // Return a cleanup function to remove the event listener
+    return () => {
+      socket?.off('message', handleNewMessage);
+    };
+  }, [fetchMessages, socket, addMessage]);
 
-  // Handle sending text message
+  // Handle sending a text message
   const handleSendMessage = async () => {
     if (!newMessage.trim()) return;
 
-    const messageToSend: ICreateMessageParams = {
+    const formData = createFormDataForMessage({
       sender: user._id,
       groupId,
       isVoiceMessage: false,
       content: newMessage,
-      file: '',
-    };
+      file: null,
+    });
 
     if (await validateSession()) {
-      if (await sendMessage(messageToSend)) setNewMessage('');
+      if (await addMessage(formData)) {
+        setNewMessage('');
+      }
     }
   };
 
-  // Handle sending voice message
-  const handleVoiceMessage = async (blobUrl: string) => {
-    const messageToSend: ICreateMessageParams = {
+  // Handle sending a voice message
+  const handleVoiceMessage = async (_: string, blob: Blob) => {
+    const formData = createFormDataForMessage({
       sender: user._id,
       groupId,
       isVoiceMessage: true,
       content: '',
-      file: blobUrl,
-    };
+      file: blob,
+    });
 
     if (await validateSession()) {
-      await sendMessage(messageToSend);
+      await addMessage(formData);
     }
   };
 
