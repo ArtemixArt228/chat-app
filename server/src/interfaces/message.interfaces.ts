@@ -4,7 +4,7 @@ export interface IMessageRepository {
         content: string | null;
         groupId: string;
         isVoiceMessage: boolean;
-        fileURL: string | null;
+        fileName: string | null;
     }): Promise<any>;
     getMessagesByGroupId(groupId: string): Promise<any>;
 }

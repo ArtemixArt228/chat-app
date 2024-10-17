@@ -10,9 +10,9 @@ class MessageService {
         private logRepository: ILogRepository
     ) {}
 
-    async createMessage(sender: string, content: string | null, groupId: string, isVoiceMessage: boolean, fileURL: string | null) {
+    async createMessage(sender: string, content: string | null, groupId: string, isVoiceMessage: boolean, fileName: string | null) {
         // Business validation for message creation
-        if (isVoiceMessage && !fileURL) {
+        if (isVoiceMessage && !fileName) {
             throw new Error("The voice message must contain a file.");
         }
         if (!isVoiceMessage && !content) {
@@ -24,12 +24,12 @@ class MessageService {
             content: isVoiceMessage ? null : content,
             groupId,
             isVoiceMessage,
-            fileURL: isVoiceMessage ? fileURL : null,
+            fileName: isVoiceMessage ? fileName : null,
         });
 
         // Log the message creation
         const description = isVoiceMessage
-            ? `User ${sender} sent a voice message: ${fileURL}`
+            ? `User ${sender} sent a voice message: ${fileName}`
             : `User ${sender} sent the text message: ${content}`;
 
         await this.logRepository.createLog("send_message", description, sender);

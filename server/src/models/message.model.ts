@@ -23,8 +23,12 @@ const messageSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    isImage: {
+        type: Boolean,
+        default: false
+    },
     // шлях до файлу якйи вкладений у повідомлення
-    fileURL: {
+    fileName: {
         type: String,
         default: null
     }

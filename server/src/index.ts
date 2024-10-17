@@ -3,7 +3,6 @@ import { createServer } from 'http';
 import cors from 'cors';
 import { Server } from 'socket.io';
 import mongoose from 'mongoose';
-import path from 'path';
 import dotenv from 'dotenv';
 
 import routes from './routes/api.route';
@@ -19,9 +18,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Serve static files for uploads
-app.use('/api/chat/src/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API Routes
 app.use('/api/chat', routes);

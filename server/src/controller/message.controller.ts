@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 
 import responseHandlers from "../handlers/response";
 
-import {messageService} from "../services/message.service";
+import { messageService, s3Service } from "../services";
+
+import { generateFileName } from '../helpers/generateFileName';
 
 class MessageController {
     async createMessage(req: Request, res: Response) {
@@ -12,9 +14,17 @@ class MessageController {
             // Convert string to boolean
             const isVoiceMessage = isVoiceMessageStr === 'true' || isVoiceMessageStr === '1';
 
-            const fileURL: string | null = req.file ? req.file.path : null;
+            if (req.file) {
+                const fileName = generateFileName()
 
-            const newMessage = await messageService.createMessage(sender, content, groupId, isVoiceMessage, fileURL);
+                await s3Service.uploadFile(req.file.buffer, fileName, req.file.mimetype)
+
+                const newMessage = await messageService.createMessage(sender, content, groupId, isVoiceMessage, fileName);
+
+                responseHandlers.created(res, newMessage);
+            }
+
+            const newMessage = await messageService.createMessage(sender, content, groupId, isVoiceMessage, null);
 
             responseHandlers.created(res, newMessage);
         } catch (error: any) {
@@ -27,6 +37,10 @@ class MessageController {
             const { groupId } = req.params;
 
             const messages = await messageService.getMessages(groupId);
+
+            for (let message of messages) {
+                message.fileUrl = await s3Service.getObjectSignedUrl(message.fileName)
+            }
 
             responseHandlers.ok(res, messages);
         } catch (error) {
