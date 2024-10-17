@@ -1,25 +1,25 @@
 export interface ICreateMessageParams {
-    sender: string;
-    content: string;
-    groupId: string;
-    isVoiceMessage?: boolean;
-    fileURL?: string;
+  sender: string;
+  content: string;
+  groupId: string;
+  isVoiceMessage?: boolean;
+  file?: string;
 }
 
 export interface IGetMessagesParams {
-    groupId: string;
+  groupId: string;
 }
 
 export interface IMessage {
-    id: string;
-    sender: string;
-    content: string;
-    groupId: string;
-    isVoiceMessage: boolean;
-    fileURL?: string;
-    createdAt: string;
+  id: string;
+  sender: string;
+  content: string;
+  groupId: string;
+  isVoiceMessage: boolean;
+  fileURL?: string;
+  createdAt: string;
 }
 
 export interface IGetMessagesResponse {
-    messages: IMessage[];
+  messages: IMessage[];
 }

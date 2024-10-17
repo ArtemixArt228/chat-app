@@ -39,7 +39,7 @@ class MessageController {
             const messages = await messageService.getMessages(groupId);
 
             for (let message of messages) {
-                message.fileUrl = await s3Service.getObjectSignedUrl(message.fileName)
+                if (message.fileName) message.fileUrl = await s3Service.getObjectSignedUrl(message.fileName)
             }
 
             responseHandlers.ok(res, messages);
