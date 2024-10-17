@@ -4,6 +4,7 @@ import { HttpServiceFactory } from "../index";
 import { IResponse } from "../../types";
 
 import { IAddMemberParams, IAddNewGroupParams, ICreateGroupParams, IGetGroupParams } from "./index.type";
+import {IChatGroup} from "../../interfaces/chat.interfaces";
 
 export class ChatGroupService {
     constructor(private httpService: HttpService) { }
@@ -33,7 +34,7 @@ export class ChatGroupService {
 
     public async getGroups() {
         try {
-            const response = await this.httpService.get<IResponse>(
+            const response = await this.httpService.get<IChatGroup[]>(
                 `groups`
             );
             return { response }

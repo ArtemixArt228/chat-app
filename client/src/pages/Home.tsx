@@ -1,8 +1,9 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import { chatUserService } from "../services/chatUser/index.service";
 import { toast } from "react-toastify";
+
+import { chatUserService } from "../services/chatUser/index.service";
 
 interface HomeProps {
     socket: Socket;
@@ -42,7 +43,7 @@ const Home: React.FC<HomeProps> = ({ socket }) => {
 
         if (isUserRegistered) {
             try {
-                const { response, error } = await chatUserService.login({ username });
+                const { response } = await chatUserService.login({ username });
 
                 if (response) {
                     let sessionID: string;
@@ -67,7 +68,7 @@ const Home: React.FC<HomeProps> = ({ socket }) => {
             }
         } else {
             try {
-                const { response, error } = await chatUserService.createUser({
+                const { response} = await chatUserService.createUser({
                     username,
                     socketID: socket.id,
                 });
@@ -87,15 +88,15 @@ const Home: React.FC<HomeProps> = ({ socket }) => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+        <div className="flex flex-col items-center justify-center h-screen bg-background">
             {!socketReady ? (
                 <p className="text-lg text-gray-600">Waiting for socket connection...</p>
             ) : (
                 <form
                     onSubmit={handleFormSubmit}
-                    className="bg-white p-6 rounded shadow-md w-full max-w-md"
+                    className="bg-light p-8 rounded-2xl shadow-lg w-full max-w-md transition-transform transform hover:scale-105 duration-300"
                 >
-                    <h2 className="text-2xl font-bold mb-4 text-center">
+                    <h2 className="text-3xl font-bold mb-6 text-center text-dark">
                         {isUserRegistered ? "Login to the chat" : "Create a new account"}
                     </h2>
                     <input
@@ -104,21 +105,21 @@ const Home: React.FC<HomeProps> = ({ socket }) => {
                         minLength={6}
                         name="username"
                         id="username"
-                        className="w-full p-3 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full p-4 border border-gray-300 rounded-lg mb-5 focus:outline-none focus:ring-2 focus:ring-primary transition duration-200"
                         value={username}
                         onChange={handleChangeUsername}
                     />
                     <button
-                        className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-300"
+                        className="w-full bg-primary text-white py-3 rounded-lg hover:bg-secondary transition duration-300 shadow-md"
                         type="submit"
                     >
                         {isUserRegistered ? "SIGN IN" : "REGISTER"}
                     </button>
                 </form>
             )}
-            <div className="mt-4">
+            <div className="mt-6">
                 <button
-                    className="text-blue-500 hover:underline"
+                    className="text-primary hover:underline transition duration-200"
                     onClick={() => setIsUserRegistered(!isUserRegistered)}
                 >
                     {isUserRegistered
@@ -127,6 +128,7 @@ const Home: React.FC<HomeProps> = ({ socket }) => {
                 </button>
             </div>
         </div>
+
     );
 };
 
