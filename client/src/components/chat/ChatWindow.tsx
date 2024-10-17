@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { LuPaperclip } from 'react-icons/lu';
 
 import VoiceRecorder from '../VoiceRecorder';
 
@@ -14,6 +15,7 @@ interface ChatWindowProps {
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ groupId }) => {
   const { messages, addMessage, fetchMessages } = useChatMessages(groupId);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const { socket } = useSocketContext();
   const { user } = useUserContext();
@@ -36,19 +38,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ groupId }) => {
 
   // Handle sending a text message
   const handleSendMessage = async () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() && !selectedImage) return;
 
     const formData = createFormDataForMessage({
       sender: user._id,
       groupId,
       isVoiceMessage: false,
+      isImage: !!selectedImage,
       content: newMessage,
-      file: null,
+      file: selectedImage,
     });
 
     if (await validateSession()) {
       if (await addMessage(formData)) {
         setNewMessage('');
+        setSelectedImage(null);
       }
     }
   };
@@ -59,12 +63,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ groupId }) => {
       sender: user._id,
       groupId,
       isVoiceMessage: true,
+      isImage: false,
       content: '',
       file: blob,
     });
 
     if (await validateSession()) {
       await addMessage(formData);
+    }
+  };
+
+  const handleImageSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      setSelectedImage(file);
     }
   };
 
@@ -98,7 +111,20 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ groupId }) => {
           <div className="text-center text-gray-500">No messages</div>
         )}
       </div>
-      <div className="p-4 border-t flex items-center bg-white rounded-b-lg shadow-inner">
+      <div className="p-4 border-t flex gap-2 items-center bg-white rounded-b-lg shadow-inner">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageSelection}
+          className="hidden"
+          id="fileInput"
+        />
+        <label
+          htmlFor="fileInput"
+          className="bg-primary h-full text-white py-2 px-4 rounded-lg flex items-center justify-center cursor-pointer hover:bg-secondary transition duration-300"
+        >
+          <LuPaperclip />
+        </label>
         <input
           type="text"
           value={newMessage}
@@ -108,7 +134,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ groupId }) => {
         />
         <button
           onClick={handleSendMessage}
-          className="ml-2 bg-primary text-white py-2 px-4 rounded-lg hover:bg-secondary transition duration-300"
+          className="bg-primary text-white py-2 px-4 rounded-lg hover:bg-secondary transition duration-300"
         >
           Send
         </button>

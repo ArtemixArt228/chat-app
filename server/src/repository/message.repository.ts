@@ -8,6 +8,7 @@ class MessageRepository implements IMessageRepository {
         content: string | null;
         groupId: string;
         isVoiceMessage: boolean;
+        isImage: boolean;
         fileName: string | null;
     }) {
         const newMessage = await messageModel.create(data);

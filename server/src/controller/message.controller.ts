@@ -8,10 +8,11 @@ import { messageService, s3Service } from "../services";
 class MessageController {
     async createMessage(req: Request, res: Response) {
         try {
-            const { sender, content, groupId, isVoiceMessage: isVoiceMessageStr } = req.body;
+            const { sender, content, groupId, isVoiceMessage: isVoiceMessageStr, isImage:  isImageMessageStr} = req.body;
 
             // Convert string to boolean
             const isVoiceMessage = isVoiceMessageStr === 'true' || isVoiceMessageStr === '1';
+            const isImage = isImageMessageStr === 'true' || isImageMessageStr === '1';
 
             let fileName = null;
 
@@ -22,7 +23,7 @@ class MessageController {
             }
 
             // Create message, passing null as the fileName if there is no file
-            const newMessage = await messageService.createMessage(sender, content, groupId, isVoiceMessage, fileName);
+            const newMessage = await messageService.createMessage(sender, content, groupId, isVoiceMessage, isImage, fileName);
 
             // Send response only once
             responseHandlers.created(res, newMessage);

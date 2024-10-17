@@ -11,7 +11,6 @@ class SessionService {
 
     async createOrUpdateSession(userId: string) {
         const existingSession = await this.sessionRepository.findChatSession({ user: userId });
-        console.log(existingSession)
 
         if (existingSession) {
             existingSession.expiresAt = new Date(Date.now() + 60 * 60 * 1000);
